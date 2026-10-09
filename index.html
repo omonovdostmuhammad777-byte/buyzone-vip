@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BoyZoneBot - Donat Hub</title>
+    <!-- Telegram WebApp Scriptini ulash -->
+    <script src="https://telegram.org"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #18181c;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --accent-color: #00cc66;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Menyuga joy qoldirish uchun */
+            box-sizing: border-box;
+            -webkit-user-select: none;
+        }
+
+        /* Yuqori qism (Header) */
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #2481cc, #1a5a9c);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Asosiy konteyner */
+        .container {
+            padding: 20px;
+        }
+
+        /* O'yinlar ro'yxati (Grid menyu) */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .game-card {
+            background-color: #24242e;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .game-card.active {
+            border-color: var(--accent-color);
+            background-color: #1c2d27;
+        }
+
+        .game-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .game-card div {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Forma qismi (ID va Miqdor) */
+        .form-group {
+            margin-top: 25px;
+            background-color: #24242e;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #18181c;
+            border: 1px solid #3a3a4a;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--tg-theme-button-color);
+        }
+
+        /* Sotib olish tugmasi */
+        .buy-btn {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 204, 102, 0.3);
+        }
+
+        /* Pastki Asosiy Menyu (Bottom Navigation) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: #1e1e24;
+            border-top: 1px solid #2d2d38;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888888;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--tg-theme-button-color);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yuqori qism -->
+    <div class="header">
+        <h1>BoyZoneBot</h1>
+        <p>Rossiyadagi eng tezkor o'yin donat xizmati</p>
+    </div>
+
+    <!-- Asosiy O'yinlar Sahifasi -->
+    <div class="container" id="shop-page">
+        <h3>Выберите игру:</h3>
+        <div class="games-grid">
+            <div class="game-card" onclick="selectGame(this, 'PUBG Mobile')">
+                <img src="https://placeholder.com" alt="PUBG">
+                <div>PUBG Mobile</div>
+            </div>
+            <div class="game-card" onclick="selectGame(this, 'Roblox')">
+                <img src="https://placeholder.com" alt="Roblox">
+                <div>Roblox</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="player-id">Введите Player ID (Игровой ID):</label>
+            <input type="text" id="player-id" placeholder="Например: 55231489">
+            
+            <label style="margin-top: 15px;" for="amount">Количество валюты (UC / Robux):</label>
+            <input type="number" id="amount" placeholder="Например: 60">
+
+            <button class="buy-btn" onclick="startPayment()">Перейти к оплате</button>
+        </div>
+    </div>
+
+    <!-- Boshqa sahifalar uchun joy (Menyu bosilganda ochiladi) -->
+    <div class="container" id="profile-page" style="display: none;">
+        <h3>Личный кабинет</h3>
+        <p>Здесь будет история ваших покупок и баланс.</p>
+    </div>
+
+    <div class="container" id="support-page" style="display: none;">
+        <h3>Поддержка 24/7</h3>
+        <p>Если у вас возникли проблемы с донатом, напишите нашему оператору.</p>
+    </div>
+
+    <!-- Pastki Menyu (Bottom Navigation Bar) -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('shop', this)">
+            <span class="nav-icon">🎮</span>
+            <span>Магазин</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('profile', this)">
+            <span class="nav-icon">👤</span>
+            <span>Профиль</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('support', this)">
+            <span class="nav-icon">💬</span>
+            <span>Помощь</span>
+        </div>
+    </div>
+
+    <script>
+        // Telegram Mini App oynasini kengaytirish
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let selectedGameName = "";
+
+        // O'yinni tanlash funksiyasi
+        function selectGame(element, gameName) {
+            document.querySelectorAll('.game-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            selectedGameName = gameName;
+        }
+
+        // Menyular o'rtasida sahifani almashtirish
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('shop-page').style.display = pageId === 'shop' ? 'block' : 'none';
+            document.getElementById('profile-page').style.display = pageId === 'profile' ? 'block' : 'none';
+            document.getElementById('support-page').style.display = pageId === 'support' ? 'block' : 'none';
+        }
+
+        // To'lov tugmasi bosilganda
+        function startPayment() {
+            const playerId = document.getElementById('player-id').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!selectedGameName) {
+                tg.showAlert("Пожалуйста, выберите игру!");
+                return;
+            }
+            if (!playerId || !amount) {
+                tg.showAlert("Заполните все поля!");
+                return;
+            }
+
+            // Kelajakda bu yer backend serverga so'rov yuboradi
+            tg.showAlert(`Игра: ${selectedGameName}\nID: ${playerId}\nКоличество: ${amount}\n\nПеренаправление на SberPay...`);
+        }
+    </script>
+</body>
+</html>
